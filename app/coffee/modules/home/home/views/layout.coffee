@@ -61,8 +61,8 @@ class ControlsView extends Mn.LayoutView
 
   keyAction: (e) =>
     e.preventDefault() if e.keyCode == 37 || e.keyCode == 39
-    return @model.addAnswer('low')  if e.keyCode == 39
-    return @model.addAnswer('high') if e.keyCode == 37
+    return @model.addAnswer('1')  if e.keyCode == 39
+    return @model.addAnswer('2') if e.keyCode == 37
 
   submitAnswer: (e) ->
     answer = $(e.currentTarget).data('submit')

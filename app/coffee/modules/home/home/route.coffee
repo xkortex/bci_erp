@@ -1,15 +1,13 @@
 LayoutView  = require './views/layout'
 TestModel   = require '../model'
+TestParams  = require './testparams'
 
 # # # # #
 
 class HomeRoute extends require '../../base/route'
 
   fetch: ->
-    @model = new TestModel({
-      tones: ['A4', 'C4']
-      timeout: 500
-    })
+    @model = new TestModel(TestParams)
 
   render: ->
     @container.show new LayoutView({ model: @model })

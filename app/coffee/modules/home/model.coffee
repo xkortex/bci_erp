@@ -1,10 +1,13 @@
+# Defines the test protocol class which will build the events and stuff
 
 class TestModel extends Backbone.Model
 
   defaults:
+    # these will be overridden by testparams.json. Just a prototype to show the format
     timeout:  1000
     tones:    ['A4','C4','A4','C4','C4','C4','A4']
     answers:  []
+    toneTimes: []
 
   initialize: (options={}) ->
     @synth = new Tone.Synth().toMaster()
@@ -17,8 +20,7 @@ class TestModel extends Backbone.Model
   addAnswer: (answer) ->
 
     data =
-      resp:       answer
-      timestamp:  new Date()
+      resp: answer
 
     answers = @get('answers')
     answers.push(data)
@@ -29,10 +31,11 @@ class TestModel extends Backbone.Model
 
   end: ->
     @trigger('end')
+    @download()
 
   restart: ->
-    @download()
     @set('answers', [])
+    @set('toneTimes',[])
     @trigger('restart')
 
   # TODO - auto-download
@@ -40,10 +43,15 @@ class TestModel extends Backbone.Model
   download: ->
     console.log 'SAVE ANSWERS'
     console.log @get('answers')
+    console.log @get('toneTimes')
+
+  playTone: (tone) ->
+    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: '0'})
+    @synth.triggerAttackRelease(tone, "8n")
 
   makeTone: (tone, time) ->
     setTimeout( =>
-      @synth.triggerAttackRelease(tone, "8n")
+      @playTone(tone)
     , time)
 
 # # # # # #
