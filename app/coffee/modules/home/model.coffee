@@ -10,7 +10,17 @@ class TestModel extends Backbone.Model
     toneTimes: []
 
   initialize: (options={}) ->
-    @synth = new Tone.Synth().toMaster()
+    @synth = new Tone.Synth(
+      oscillator: {
+        type: "square"
+      }
+      envelope: {
+        attack:  0.00
+        decay:   0.3
+        sustain: 0.25
+        release: 0.5
+      }
+    ).toMaster()
 
   start: ->
     @trigger('start')
