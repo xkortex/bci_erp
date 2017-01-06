@@ -4,13 +4,13 @@ import random
 
 
 filename = 'testparams.coffee'      # Output param file
-num_trials = 20     # Number of trials to run
-num_pad = 3         # ensure at least num_pad low tones occur first
-time_ms = 1200      # Time in ms for each trial
+num_trials = 10     # Number of trials to run
+num_pad = 2         # ensure at least num_pad low tones occur first
+time_ms = 400      # Time in ms for each trial
 oddball_rate = 0.20 # This is the rate at which the oddball occurs
 
 # Tones to be used by the module
-tones = ['C4', 'B4']  # lo/hi - Should only be two so we can use some hackery to do the randomness
+tones = ['C4', 'C5']  # lo/hi - Should only be two so we can use some hackery to do the randomness
 
 def get_weighted_bits(p=0.5):
     # p is the probability of returning a 1
@@ -70,11 +70,16 @@ coffee_object = """
 module.exports =
   timeout: {TIMEOUT_MS}
   tones: {TONES_LIST}
+  toneLow: '{TONE_LOW}'
+  toneHigh: '{TONE_HIGH}'
 """
 tones_list = [tones[0] for dummy in range(num_pad)]
 tones_list += [tones[i] for i in get_asserted_epoch_list(num_trials, oddball_rate)]
 
-coffee_file = coffee_header + coffee_object.format(TIMEOUT_MS=time_ms, TONES_LIST=tones_list)
+coffee_file = coffee_header + coffee_object.format(TIMEOUT_MS=time_ms,
+                                                   TONES_LIST=tones_list,
+                                                   TONE_LOW=tones[0],
+                                                   TONE_HIGH=tones[1])
 
 print(coffee_file)
 with open(filename, 'w') as ofile:

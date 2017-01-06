@@ -14,12 +14,32 @@ class StartView extends Mn.LayoutView
 
   ui:
     start: '[data-click=start]'
+    play: '[data-play]'
 
   events:
     'click @ui.start': 'start'
+    'click @ui.play': 'play'
+
+  play: (e) ->
+    tone = $(e.currentTarget).data('play')
+    @model.playTone(@model.get('toneLow')) if tone == 1
+    @model.playTone(@model.get('toneHigh')) if tone == 2
+
 
   start: ->
     @model.start()
+
+  # I think I know what I'm doing...
+  initialize: ->
+    $(document).on 'keydown', @keyAction
+
+  onBeforeDestroy: ->
+    $(document).off 'keydown', @keyAction
+
+  keyAction: (e) =>
+    e.preventDefault() if e.keyCode == 37 || e.keyCode == 39
+    return @model.playTone(@model.get('toneHigh'))  if e.keyCode == 39 # right arrow
+    return @model.playTone(@model.get('toneLow')) if e.keyCode == 37 # left arrow
 
 # # # # #
 

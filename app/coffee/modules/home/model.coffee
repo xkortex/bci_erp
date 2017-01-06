@@ -6,6 +6,8 @@ class TestModel extends Backbone.Model
     # these will be overridden by testparams.json. Just a prototype to show the format
     timeout:  1000
     tones:    ['A4','C4','A4','C4','C4','C4','A4']
+    toneLow: 'C4'
+    toneHigh: 'B4'
     answers:  []
     toneTimes: []
 
@@ -56,12 +58,16 @@ class TestModel extends Backbone.Model
     console.log @get('toneTimes')
 
   playTone: (tone) ->
-    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: '0'})
     @synth.triggerAttackRelease(tone, "8n")
+
+
+  playToneRecord: (tone) ->
+    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: '0'})
+    @playTone(tone)
 
   makeTone: (tone, time) ->
     setTimeout( =>
-      @playTone(tone)
+      @playToneRecord(tone)
     , time)
 
 # # # # # #
