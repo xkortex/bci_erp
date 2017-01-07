@@ -18,6 +18,11 @@ paths =
     src:  './app/nwk_package.coffee'
     dest: './build/package.json'
 
+  nwk_release:
+    src:  './build/**/**'
+    platforms: ['oxs64']
+    version: '0.14.6'
+
   sass:
     src:  './app/sass/app.sass'
     dest: './build/css/'
@@ -89,19 +94,21 @@ gulp.task 'nodewebkit_package', ->
 NwBuilder = require 'nw-builder'
 gulp.task 'nodewebkit_release', ->
   nw = new NwBuilder
-    files:        './build/**/**'
+    files:        paths.nwk_release.src
+    platforms:    paths.nwk_release.platforms
+    version:      paths.nwk_release.version
     downloadUrl:  'https://dl.nwjs.io/'
-    platforms:    ['osx64']
-    version:      '0.14.6'
 
   # Log NWK Build
   nw.on 'log', console.log
 
   # Build returns a promise
-  nw.build().then(->
+  nw.build()
+  .then ->
     console.log 'NWK Build complete'
     return
-  ).catch (error) ->
+
+  .catch (error) ->
     console.log 'NWK Build Error!'
     console.error error
     return
