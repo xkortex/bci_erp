@@ -19,9 +19,9 @@ paths =
     dest: './build/package.json'
 
   nwk_release:
-    src:  './build/**/**'
-    platforms: ['oxs64']
-    version: '0.14.6'
+    src:        './build/**/**'
+    version:    '0.14.6'
+    platforms: ['osx64']
 
   sass:
     src:  './app/sass/app.sass'
@@ -120,14 +120,11 @@ gulp.task 'nodewebkit_release', ->
 # Build tasks
 gulp.task 'default', ['dev']
 
-gulp.task 'build', =>
-  plugins.runSequence.use(gulp)('copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle')
-
 gulp.task 'dev', =>
-  plugins.runSequence.use(gulp)('env_dev', 'build', 'watch', 'webserver')
+  plugins.runSequence.use(gulp)('env_dev', 'copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'watch', 'webserver')
 
 gulp.task 'release', =>
-  plugins.runSequence.use(gulp)('env_prod', 'build', => console.log 'Release completed.' )
+  plugins.runSequence.use(gulp)('env_prod', 'copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle', => console.log 'Release completed.' )
 
 gulp.task 'nwk_release', =>
-  plugins.runSequence.use(gulp)('env_dev', 'build', 'nodewebkit_package', 'nodewebkit_release', => console.log 'NWK Release completed.' )
+  plugins.runSequence.use(gulp)('env_dev', 'copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'nodewebkit_package', 'nodewebkit_release', => console.log 'NWK Release completed.' )
