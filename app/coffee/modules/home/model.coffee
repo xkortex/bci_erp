@@ -1,13 +1,28 @@
+# Defines the test protocol class which will build the events and stuff
 
 class TestModel extends Backbone.Model
 
   defaults:
+    # these will be overridden by testparams.json. Just a prototype to show the format
     timeout:  1000
     tones:    ['A4','C4','A4','C4','C4','C4','A4']
+    toneLow: 'C4'
+    toneHigh: 'B4'
     answers:  []
+    toneTimes: []
 
   initialize: (options={}) ->
-    @synth = new Tone.Synth().toMaster()
+    @synth = new Tone.Synth(
+      oscillator: {
+        type: "square"
+      }
+      envelope: {
+        attack:  0.00
+        decay:   0.3
+        sustain: 0.25
+        release: 0.5
+      }
+    ).toMaster()
 
   start: ->
     @trigger('start')
@@ -17,8 +32,7 @@ class TestModel extends Backbone.Model
   addAnswer: (answer) ->
 
     data =
-      resp:       answer
-      timestamp:  new Date()
+      resp: answer
 
     answers = @get('answers')
     answers.push(data)
@@ -29,10 +43,11 @@ class TestModel extends Backbone.Model
 
   end: ->
     @trigger('end')
+    @download()
 
   restart: ->
-    @download()
     @set('answers', [])
+    @set('toneTimes',[])
     @trigger('restart')
 
   # TODO - auto-download
@@ -40,10 +55,19 @@ class TestModel extends Backbone.Model
   download: ->
     console.log 'SAVE ANSWERS'
     console.log @get('answers')
+    console.log @get('toneTimes')
+
+  playTone: (tone) ->
+    @synth.triggerAttackRelease(tone, "8n")
+
+
+  playToneRecord: (tone) ->
+    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: '0'})
+    @playTone(tone)
 
   makeTone: (tone, time) ->
     setTimeout( =>
-      @synth.triggerAttackRelease(tone, "8n")
+      @playToneRecord(tone)
     , time)
 
 # # # # # #

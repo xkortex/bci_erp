@@ -58,6 +58,8 @@ paths =
       nodeModules + 'bluebird/js/browser/bluebird.min.js'
       nodeModules + 'hammerjs/hammer.js'
       nodeModules + 'tone/build/Tone.js'
+      nodeModules + 'moment/moment.js'
+
     ]
 
 # Import Plugins

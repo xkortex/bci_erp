@@ -1,4 +1,8 @@
-# Electron Boilerplate
+# BCI ERP Lab App
+App for conducting ERP (event related potential) experiments in conjunction with BCI systems
+
+Lightweight GUI interface for collecting user input using the Tone Oddball paradigm to elicit P300 EEG signals.
+
 
 **Built with:**
 
