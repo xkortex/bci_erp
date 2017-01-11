@@ -25,7 +25,6 @@ class StartView extends Mn.LayoutView
     @model.playTone(@model.get('toneLow')) if tone == 1
     @model.playTone(@model.get('toneHigh')) if tone == 2
 
-
   start: ->
     @model.start()
 
@@ -37,9 +36,10 @@ class StartView extends Mn.LayoutView
     $(document).off 'keydown', @keyAction
 
   keyAction: (e) =>
-    e.preventDefault() if e.keyCode == 37 || e.keyCode == 39
+    e.preventDefault() if e.keyCode == 37 || e.keyCode == 39 || 32
     return @model.playTone(@model.get('toneHigh'))  if e.keyCode == 39 # right arrow
     return @model.playTone(@model.get('toneLow')) if e.keyCode == 37 # left arrow
+    return @start() if e.keyCode == 32 # Start
 
 # # # # #
 
@@ -94,6 +94,9 @@ class TestLayoutView extends Mn.LayoutView
   template: require './templates/layout'
   className: 'container-fluid test-container'
 
+  behaviors:
+    DownloadFile: {}
+
   regions:
     startRegion:    '[data-region=start]'
     controlsRegion: '[data-region=controls]'
@@ -104,6 +107,7 @@ class TestLayoutView extends Mn.LayoutView
     'start':    'onStart'
     'end':      'onEnd'
     'restart':  'onRestart'
+    'download': 'onDownload'
 
   onRender: ->
     @startRegion.show new StartView({ model: @model })
@@ -120,6 +124,16 @@ class TestLayoutView extends Mn.LayoutView
     @controlsRegion.empty()
     @progressRegion.empty()
     @endRegion.show new EndView({ model: @model })
+
+  onDownload: (raw_txt) ->
+
+    donwloadOptions =
+      filename: 'download.csv'
+      type:     'text/plain'
+      content:  raw_txt
+
+    # @downloadFile method defined in the DownloadFile behavior (beahviors/downloadFile.coffee)
+    @downloadFile(donwloadOptions)
 
 # # # # #
 
