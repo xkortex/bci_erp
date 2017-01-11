@@ -26,7 +26,8 @@ class StartView extends Mn.LayoutView
     @model.playTone(@model.get('toneHigh')) if tone == 2
 
   start: ->
-    @model.start()
+    # @model.start()
+    @trigger('start')
 
   # I think I know what I'm doing...
   initialize: ->
@@ -40,6 +41,32 @@ class StartView extends Mn.LayoutView
     return @model.playTone(@model.get('toneHigh'))  if e.keyCode == 39 # right arrow
     return @model.playTone(@model.get('toneLow')) if e.keyCode == 37 # left arrow
     return @start() if e.keyCode == 32 # Start
+
+# # # # #
+
+class CountdownView extends Mn.LayoutView
+  template: require './templates/countdown'
+  className: 'row'
+
+  ui:
+    counter: '[data-display=count]'
+
+  templateHelpers: ->
+    return { count: 3 }
+
+  onRender: ->
+    @setCount(3, 0)
+    @setCount(2, 1000)
+    @setCount(1, 2000)
+
+    setTimeout( =>
+      @model.start()
+    , 3000)
+
+  setCount: (count, timeout) ->
+    setTimeout( =>
+      @ui.counter.text(count)
+    , timeout)
 
 # # # # #
 
@@ -99,6 +126,7 @@ class TestLayoutView extends Mn.LayoutView
 
   regions:
     startRegion:    '[data-region=start]'
+    counterRegion:  '[data-region=counter]'
     controlsRegion: '[data-region=controls]'
     endRegion:      '[data-region=end]'
     progressRegion: '[data-region=progress]'
@@ -110,13 +138,19 @@ class TestLayoutView extends Mn.LayoutView
     'download': 'onDownload'
 
   onRender: ->
-    @startRegion.show new StartView({ model: @model })
+    startView = new StartView({ model: @model })
+    startView.on 'start', => @onBeforeStart()
+    @startRegion.show(startView)
 
   onRestart: ->
     @render()
 
-  onStart: ->
+  onBeforeStart: ->
     @startRegion.empty()
+    @counterRegion.show new CountdownView({ model: @model })
+
+  onStart: ->
+    @counterRegion.empty()
     @controlsRegion.show new ControlsView({ model: @model })
     @progressRegion.show new ProgressView({ model: @model })
 
@@ -132,7 +166,8 @@ class TestLayoutView extends Mn.LayoutView
       type:     'text/plain'
       content:  raw_txt
 
-    # @downloadFile method defined in the DownloadFile behavior (beahviors/downloadFile.coffee)
+    # @downloadFile method defined in the DownloadFile behavior
+    # (beahviors/downloadFile.coffee)
     @downloadFile(donwloadOptions)
 
 # # # # #
