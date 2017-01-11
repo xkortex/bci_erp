@@ -6,7 +6,7 @@ class TestModel extends Backbone.Model
     # these will be overridden by testparams.json. Just a prototype to show the format
     timeout:  1000
     tones:    ['A4','C4','A4','C4','C4','C4','A4']
-    toneLow: 'C4'
+    toneLow:  'C4'
     toneHigh: 'B4'
     answers:  []
     toneTimes: []
@@ -32,7 +32,8 @@ class TestModel extends Backbone.Model
   addAnswer: (answer) ->
 
     data =
-      resp: answer
+      resp:       answer
+      timestamp:  moment().format('x'),
 
     answers = @get('answers')
     answers.push(data)
@@ -50,19 +51,38 @@ class TestModel extends Backbone.Model
     @set('toneTimes',[])
     @trigger('restart')
 
-  # TODO - auto-download
-  # TODO - format data?
+  # Formats download string & triggers view to download file
   download: ->
-    console.log 'SAVE ANSWERS'
-    console.log @get('answers')
-    console.log @get('toneTimes')
+    downloadString = @formatDownload()
+    @trigger('download', downloadString)
+
+  formatDownload: ->
+    downloadString = ''
+
+    makeRow = (obj) ->
+      row = []
+      row.push obj.timestamp
+      row.push obj.resp || 0
+      row.push obj.tone || 0
+      return row.join(',')
+
+    # Assembles CSV results
+    for each in @get('toneTimes')
+      downloadString += makeRow(each)
+      downloadString += "\n"
+
+    # Assembles CSV results
+    for each in @get('answers')
+      downloadString += makeRow(each)
+      downloadString += "\n"
+
+    return downloadString
 
   playTone: (tone) ->
     @synth.triggerAttackRelease(tone, "8n")
 
-
   playToneRecord: (tone) ->
-    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: '0'})
+    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: null })
     @playTone(tone)
 
   makeTone: (tone, time) ->

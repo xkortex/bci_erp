@@ -4,3 +4,4 @@ module.exports =
   Haptic:         require './haptic'
   KeyClick:       require './keyClick'
   SubmitButton:   require './submitButton'
+  DownloadFile:   require './downloadFile'
