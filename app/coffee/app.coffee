@@ -16,7 +16,7 @@ window.Layout = require './application/layout'
 # Components are routeless services with views that are
 # accessible anywhere in the application
 # Used to manage the header, sidebar, flash, and confirm UI elements
-SidebarComponent  = require './components/sidebar/component'
+# SidebarComponent  = require './components/sidebar/component'
 FlashComponent    = require './components/flash/component'
 OverlayComponent  = require './components/overlay/component'
 ConfirmComponents = require './components/confirm/component'

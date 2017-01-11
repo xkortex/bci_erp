@@ -1,25 +1,36 @@
-.col-xs-6
-  .btn.btn-lg.btn-primary-outline.w-100(data-play='1')
-    i.fa.fa-fw.fa-arrow-left
-    | Play Low Tone Example
 
-.col-xs-6
-  .btn.btn-lg.btn-primary-outline.w-100(data-play='2')
-    i.fa.fa-fw.fa-arrow-right
-    | Play High Tone Example
-
-.col-xs-12.col-sm-6.col-sm-push-3.text-center
-
-  p.lead Classify tones in the order you hear them.
-
-  p.lead Use the left (⇦) and right (⇨) arrow keys to control. When you hear a tone, press the corresponding key.
-  p.lead Low tone : press ⇦
-  p.lead High tone: press ⇨
-
-  p.lead
-    small Keyboard controls are enabled.
+.col-xs-12.col-sm-8.col-sm-push-2.text-center
 
 
-  .btn.btn-lg.btn-primary-outline.w-100(data-click='start')
-    i.fa.fa-fw.fa-play
-    | Start Experiment
+  h4 Classify tones in the order you hear them.
+
+  p.lead Use the left (⇦) and right (⇨) arrow keys to control.
+
+  p.lead When you hear a tone, press the corresponding key.
+
+  //- .row.m-t-2
+  //-   .col-xs-6
+  //-     p.lead Low tone : press ⇦
+
+  //-   .col-xs-6
+  //-     p.lead High tone: press ⇨
+
+  .row
+    .col-xs-6
+      .btn.btn-lg.btn-primary-outline.w-100(data-play='1')
+        //- i.fa.fa-fw.fa-arrow-left
+        | Low tone : press ⇦
+
+    .col-xs-6
+      .btn.btn-lg.btn-primary-outline.w-100(data-play='2')
+        //- i.fa.fa-fw.fa-arrow-right
+        | High tone : press ⇨
+
+  .row.m-t-2
+    .col-xs-12.text-center
+      h5 Press the spacebar to begin the test.
+
+    .col-xs-6.col-xs-push-3
+      .btn.btn-lg.btn-primary-outline.w-100(data-click='start')
+        i.fa.fa-fw.fa-play
+        | Start Experiment
