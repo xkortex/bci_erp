@@ -4,10 +4,10 @@ import random
 
 
 filename = 'testparams.coffee'      # Output param file
-num_trials = 10     # Number of trials to run
+num_trials = 4     # Number of trials to run
 num_pad = 2         # ensure at least num_pad low tones occur first
 time_ms = 400      # Time in ms for each trial
-oddball_rate = 0.20 # This is the rate at which the oddball occurs
+oddball_rate = 0.25 # This is the rate at which the oddball occurs
 
 # Tones to be used by the module
 tones = ['C4', 'C5']  # lo/hi - Should only be two so we can use some hackery to do the randomness
@@ -75,6 +75,7 @@ module.exports =
 """
 tones_list = [tones[0] for dummy in range(num_pad)]
 tones_list += [tones[i] for i in get_asserted_epoch_list(num_trials, oddball_rate)]
+tones_list += ['C3'] # Sequence complete tone
 
 coffee_file = coffee_header + coffee_object.format(TIMEOUT_MS=time_ms,
                                                    TONES_LIST=tones_list,
