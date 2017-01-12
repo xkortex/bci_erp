@@ -1,7 +1,16 @@
 ## Programmatically generate the file testparams.coffee
 
-import random
+import os, random
 
+basepath, folder = os.path.split(os.getcwd())
+if folder == 'python':
+    os.chdir(basepath) # Navigate to the root of the project unless we are already there
+elif folder == 'bci_erp': # no idea if this is safe!!
+    basepath = os.getcwd()
+else:
+    raise OSError('Python script was executed from an unknown path. Try running from (project_root)/python/')
+
+location_paramfile = 'app/coffee/modules/home/home'
 
 filename = 'testparams.coffee'      # Output param file
 num_trials = 4     # Number of trials to run
@@ -84,4 +93,4 @@ coffee_file = coffee_header + coffee_object.format(TIMEOUT_MS=time_ms,
 
 print(coffee_file)
 with open(filename, 'w') as ofile:
-    ofile.write(coffee_file)
+    ofile.write(basepath + coffee_file)

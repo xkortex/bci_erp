@@ -162,7 +162,7 @@ class TestLayoutView extends Mn.LayoutView
   onDownload: (raw_txt) ->
 
     donwloadOptions =
-      filename: 'download.csv'
+      filename: moment().format('x')#'download.csv' # todo: dynamically name this
       type:     'text/plain'
       content:  raw_txt
 
