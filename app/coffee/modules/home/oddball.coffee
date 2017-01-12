@@ -46,7 +46,7 @@ class OddballTrial
       k_int = Math.round(k)
       E_int = Math.round(E)
       if not (k == k_int and E == E_int)
-          alert("#{k}, #{k_int}, #{E}, #{E_int}")
+          alert("get asserted epoch list: #{n}, #{p}, #{k}, #{k_int}, #{E}, #{E_int}")
           throw "(Internal Error) The values 1/p and p*n must both be integer values."
       k = Math.round(k)
       E = Math.round(E)
@@ -73,7 +73,7 @@ class OddballTrial
 
   generate_default_trial: ->
     trial = @generate_trial(@num_trials, @oddball_rate)
-    @tones = trial
+    @trialTones = trial
     return trial
 
 #experiment = new OddballTrial()

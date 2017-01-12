@@ -47,21 +47,25 @@ class StartView extends Mn.LayoutView
 class CountdownView extends Mn.LayoutView
   template: require './templates/countdown'
   className: 'row'
+#  countdownCount = 3
+  countdownCount = 1 # speed up for testing
 
   ui:
     counter: '[data-display=count]'
 
   templateHelpers: ->
-    return { count: 3 }
+    return { count: @countdownCount }
 
   onRender: ->
     @setCount(3, 0)
-    @setCount(2, 1000)
-    @setCount(1, 2000)
+#    @setCount(2, 1000)
+#    @setCount(1, 2000)
 
     setTimeout( =>
       @model.start()
-    , 3000)
+#    , 3000)
+    , 1000)
+
 
   setCount: (count, timeout) ->
     setTimeout( =>
