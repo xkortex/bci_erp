@@ -5,7 +5,7 @@ class TestModel extends Backbone.Model
   defaults:
     # these will be overridden by testparams.json. Just a prototype to show the format
     timeout:  1000
-    tones:    ['A4','C4','A4','C4','C4','C4','A4']
+    trialTones:    ['A4','C4','A4','C4','C4','C4','A4']
     toneLow:  'C4'
     toneHigh: 'B4'
     answers:  []
@@ -26,7 +26,7 @@ class TestModel extends Backbone.Model
 
   start: ->
     @trigger('start')
-    for tone, index in @get('tones')
+    for tone, index in @get('trialTones')
       @makeTone(tone, index * @get('timeout'))
 
   addAnswer: (answer) ->
@@ -40,7 +40,7 @@ class TestModel extends Backbone.Model
     @trigger('answer')
 
     # Ends if all tones have been answered
-    @end() if answers.length == @get('tones').length
+    @end() if answers.length == @get('trialTones').length
 
   end: ->
     @trigger('end')

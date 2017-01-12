@@ -8,6 +8,6 @@
 
 module.exports =
   timeout: 400
-  tones: ['C4', 'C4', 'C4', 'C4', 'C5', 'C4', 'C3']
+  trialTones: ['C4', 'C4', 'C4', 'C4', 'C5', 'C4', 'C3']
   toneLow: 'C4'
   toneHigh: 'C5'
