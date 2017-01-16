@@ -13,9 +13,9 @@ else:
 location_paramfile = 'app/coffee/modules/home/home'
 
 filename = 'testparams.coffee'      # Output param file
-num_trials = 4     # Number of trials to run
-num_pad = 2         # ensure at least num_pad low availableTones occur first
-time_ms = 400      # Time in ms for each trial
+num_trials = 40     # Number of trials to run
+num_pad = 3         # ensure at least num_pad low availableTones occur first
+time_ms = 1500      # Time in ms for each trial
 oddball_rate = 0.25 # This is the rate at which the oddball occurs
 
 # Tones to be used by the module
@@ -92,5 +92,7 @@ coffee_file = coffee_header + coffee_object.format(TIMEOUT_MS=time_ms,
                                                    TONE_HIGH=tones[1])
 
 print(coffee_file)
-with open(filename, 'w') as ofile:
-    ofile.write(basepath + coffee_file)
+fullpath = basepath + '/' + location_paramfile + '/' + filename
+with open(fullpath, 'w') as ofile:
+    ofile.write(coffee_file)
+    print("Wrote to: {}".format(fullpath))
