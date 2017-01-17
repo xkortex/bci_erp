@@ -17,3 +17,5 @@ cache
 
 # IDE stuff
 .idea*
+__pycache__*
+
