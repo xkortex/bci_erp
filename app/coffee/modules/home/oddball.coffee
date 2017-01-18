@@ -87,12 +87,7 @@ class OddballTrial extends Backbone.Model
     return 0
 
   get_weighted_bitlist: (n, p) ->
-    bitlist = []
-
-    bitlist.push(@get_weighted_bits(p)) for i in [0...n]
-#    bitlist = [@get_weighted_bits(p) for i in n]
-#    console.log("get_weighted_bitlist: |#{bitlist}|")
-    return bitlist
+    return (@get_weighted_bits(p) for i in [0...n])
 
   get_asserted_list: (n, p) ->
     console.log("get_asserted_list(#{n}, #{p})")
@@ -105,7 +100,6 @@ class OddballTrial extends Backbone.Model
 
     iters = 0
     while iters < 100
-#      bitlist = [@get_weighted_bits(p) for dummy in [0...n]]
       bitlist = @get_weighted_bitlist(n, p)
       console.log("typeof bitlist element: ")
       console.log(typeof 2)
@@ -151,13 +145,15 @@ class OddballTrial extends Backbone.Model
   generate_trial: (num_trials, oddball_rate) ->
 #    alert("#{num_trials}, #{oddball_rate}, #{@num_pad}")
     console.log("generate_trial(#{num_trials}, #{oddball_rate})")
-    tones_list = [@availableTones[0] for dummy in [0...@num_pad]]
+    tones_list = (@availableTones[0] for dummy in [0...@num_pad])
     console.log("Attempting main epoch routine")
-    tones_list += [@availableTones[i] for i in @get_asserted_epoch_list(num_trials, oddball_rate)]
+    bit_list =  (0 for dummy in [0...@num_pad])
+    bit_list = bit_list.concat(@get_asserted_epoch_list(num_trials, oddball_rate))
+    bit_list = bit_list.concat([2])
     console.log("Completed main epoch routine")
-    return null
-    tones_list += [@availableTones[2]] # Sequence complete tone
-    console.log(tones_list)
+    console.log("bit_list", bit_list)
+    tones_list = (@availableTones[bit] for bit in bit_list) # Sequence complete tone
+    console.log("generate_trial: tones_list", tones_list)
     return tones_list
 
   generate_default_trial: ->
