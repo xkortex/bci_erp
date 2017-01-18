@@ -1,3 +1,12 @@
+K_ENTER = 13
+K_SHIFT = 16
+K_ESC = 27
+K_SPACE = 32
+K_LEFT = 37
+K_UP = 38
+K_RIGHT = 39
+K_DOWN = 40
+K_A = 65
 
 class ProgressView extends Mn.LayoutView
   template: require './templates/progress'
@@ -27,6 +36,7 @@ class StartView extends Mn.LayoutView
 
   start: ->
     # @model.start()
+    @model.setup_experiment()
     @trigger('start')
 
   # I think I know what I'm doing...
@@ -37,10 +47,10 @@ class StartView extends Mn.LayoutView
     $(document).off 'keydown', @keyAction
 
   keyAction: (e) =>
-    e.preventDefault() if e.keyCode == 37 || e.keyCode == 39 || 32
-    return @model.playTone(@model.get('toneHigh'))  if e.keyCode == 39 # right arrow
-    return @model.playTone(@model.get('toneLow')) if e.keyCode == 37 # left arrow
-    return @start() if e.keyCode == 32 # Start
+    e.preventDefault() if e.keyCode in [K_LEFT, K_RIGHT, K_SPACE] #== 37 || e.keyCode == 39 || 32
+    return @model.playTone(@model.get('toneHigh'))  if e.keyCode == K_RIGHT # right arrow
+    return @model.playTone(@model.get('toneLow')) if e.keyCode == K_LEFT # left arrow
+    return @start() if e.keyCode == K_SPACE # Start
 
 # # # # #
 
@@ -111,9 +121,12 @@ class ControlsView extends Mn.LayoutView
     $(document).off 'keydown', @keyAction
 
   keyAction: (e) =>
-    e.preventDefault() if e.keyCode == 37 || e.keyCode == 39
-    return @model.addAnswer('1')  if e.keyCode == 39
-    return @model.addAnswer('2') if e.keyCode == 37
+    console.log(e.keyCode)
+    # 37 = left, 39 = right
+    e.preventDefault() if e.keyCode in [K_LEFT, K_RIGHT] #== 37 || e.keyCode == 39
+    return @model.addAnswer('1')  if e.keyCode == K_LEFT
+    return @model.addAnswer('2') if e.keyCode == K_RIGHT
+    return @model.halt() if e.keyCode == K_ESC || K_ENTER
 
   submitAnswer: (e) ->
     answer = $(e.currentTarget).data('submit')

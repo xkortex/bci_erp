@@ -4,38 +4,31 @@
 Array::sum = (fn = (x) -> x) ->
   @reduce ((a, b) -> a + fn b), 0
 
-class OddballTrial extends Backbone.Model
+class OddballTrial
   #  constructor: (@dummy)  ->
-  #    console.log("Constructor called on OddballTrial")
-  defaults:
-    stuff: 0
+
   # Tones to be used by the module
 
 
-  initialize: (options = {}) ->
-    spam = 2
-# Only first two will be used for the random trials
-
-  setup: () ->
-    console.log("Oddball setup() called")
-    # Feels super janky but idk how to do it better
-    @num_trials = 8 # Number of trials to run
+  constructor: (options = {}) ->
+    console.log("Constructor called on OddballTrial")
+    @num_trials = 12 # Number of trials to run
     @num_pad = 2 # ensure at least num_pad low tones occur first
     @time_ms = 400 # Time in ms for each trial
     @oddball_rate = 0.25 # This is the rate at which the oddball occurs
     @availableTones = ['F4', 'C5', 'C3'] # [lo, hi, end]
-    @bar = 55
+    # Only first two will be used for the random trials
+
     @toneLow = @availableTones[0]
     @toneHigh = @availableTones[1]
     @toneEnd = @availableTones[2]
 
+
+
   conveyor: (ary) ->
     # First element goes to end of list. Creates a new object
     ary2 = (ary[n] for n in [1...ary.length])
-    console.log("conveyor", ary2)
     ary2.push(ary[0])
-    console.log("conveyor", ary2)
-
     return ary2
 
 
@@ -43,10 +36,7 @@ class OddballTrial extends Backbone.Model
     return ary.reduce (t, s) -> Math.max(t, s)
 
   sum: (ary) ->
-    console.log("sum(array)", ary)
-
     accu = ary.reduce (t, s)->t + s
-    console.log("accu", accu)
     return accu
 
     #    console.log(ary)
@@ -59,21 +49,9 @@ class OddballTrial extends Backbone.Model
   check_for_adjacent: (bitlist) ->
     # Now we need to check to see if we have any adjacent ones
     bitlist2 = @conveyor(bitlist)
-#    bitlist2.push(bitlist2.shift()) # move first to end
-    console.log("check_for_adjacent: |#{bitlist}|#{bitlist2}|")
-    console.log(typeof bitlist, typeof bitlist2, typeof bitlist[0], typeof bitlist2[0])
-    console.log(bitlist2[0])
-#    ziplist = _.zip(bitlist, bitlist2)
-#    console.log("check_for_adjacent (ziplist): |#{ziplist}|")
     sumlist = []
     sumlist.push(bitlist[i]+ bitlist2[i]) for i in [0...bitlist.length]
-    console.log("Summing: ", bitlist[i], bitlist2[i]) for i in [0...bitlist.length]
-
-    console.log("check_for_adjacent (sumlist): |#{sumlist}|")
-
     valmax = @max(sumlist)
-    console.log("check_for_adjacent (valmax): |#{valmax}|")
-
     if 1 == valmax
       return true
     return false
@@ -90,7 +68,6 @@ class OddballTrial extends Backbone.Model
     return (@get_weighted_bits(p) for i in [0...n])
 
   get_asserted_list: (n, p) ->
-    console.log("get_asserted_list(#{n}, #{p})")
 # This will produce a list with EXACTLY p percent ones in it. This is so we do not get oddballs with no tones
     k = p * n
     k_int = Math.round(k)
@@ -101,11 +78,7 @@ class OddballTrial extends Backbone.Model
     iters = 0
     while iters < 100
       bitlist = @get_weighted_bitlist(n, p)
-      console.log("typeof bitlist element: ")
-      console.log(typeof 2)
-      console.log(typeof bitlist[0])
       bitsum = @sum(bitlist)
-      console.log("get_asserted_list Bitsum: |#{bitsum}|")
       return bitlist if bitsum == k
       iters += 1
 
@@ -146,22 +119,20 @@ class OddballTrial extends Backbone.Model
 #    alert("#{num_trials}, #{oddball_rate}, #{@num_pad}")
     console.log("generate_trial(#{num_trials}, #{oddball_rate})")
     tones_list = (@availableTones[0] for dummy in [0...@num_pad])
-    console.log("Attempting main epoch routine")
     bit_list =  (0 for dummy in [0...@num_pad])
     bit_list = bit_list.concat(@get_asserted_epoch_list(num_trials, oddball_rate))
     bit_list = bit_list.concat([2])
-    console.log("Completed main epoch routine")
-    console.log("bit_list", bit_list)
     tones_list = (@availableTones[bit] for bit in bit_list) # Sequence complete tone
-    console.log("generate_trial: tones_list", tones_list)
+#    console.log("generate_trial: tones_list", tones_list)
+    @trialTones = tones_list
+    console.log("Completed generate_trial")
+
     return tones_list
 
   generate_default_trial: ->
-    @setup()
     console.log("generate_default_trial(#{@num_trials}, #{@oddball_rate})")
     trial = null
     trial = @generate_trial(@num_trials, @oddball_rate)
-    @trialTones = trial
     return trial
 
 #experiment = new OddballTrial()
