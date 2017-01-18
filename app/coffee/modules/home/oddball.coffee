@@ -14,14 +14,14 @@ class OddballTrial
     console.log("Constructor called on OddballTrial")
     @num_trials = 12 # Number of trials to run
     @num_pad = 2 # ensure at least num_pad low tones occur first
-    @time_ms = 400 # Time in ms for each trial
+    @timeout = 1000 # Time in ms for each trial
     @oddball_rate = 0.25 # This is the rate at which the oddball occurs
     @availableTones = ['F4', 'C5', 'F4'] # [lo, hi, end]
     # Only first two will be used for the random trials
-
     @toneLow = @availableTones[0]
     @toneHigh = @availableTones[1]
     @toneEnd = @availableTones[2]
+    @trialTones = ['A5', 'B5', 'C5']
 
 
 

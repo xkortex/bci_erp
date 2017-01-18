@@ -40,12 +40,15 @@ class TestModel extends Backbone.Model
     @set('filename', 'oddball_run_' + moment().format('YYYY-MM-DD_HH-MM-SS')) # 2017-01-18_15-04-20-oddball.txt
     @set('trialTones', oddball.trialTones)
     @set('runlength', oddball.trialTones.length)
+    @set('timeout', oddball.timeout)
+    console.log('timeout', oddball.timeout)
+    #todo: just put this all in the object and call into it
     @set('idx', 0)
     console.log("Bound new experiment to model")
 
   halt: ->
     @set('running', false)
-    console.log("Manually halted")
+    console.log("Manually halted, running = ", @get('running'))
 
   start: ->
     @set('running', true)
@@ -54,20 +57,32 @@ class TestModel extends Backbone.Model
 
     trialTones = @get('trialTones')
     i = 0
-    for tone, index in @get('trialTones')
-#    while i < trialTones.length
-      console.log("start, trialTones", tone)
-      @makeTone(tone, index * @get('timeout'))
 
-  tick: ->
+    @tick()
+#    for tone, index in @get('trialTones')
+#      console.log("start, trialTones", tone)
+#      @makeTone(tone, index * @get('timeout'))
+
+  tick: =>
     idx = @get('idx')
-    if idx >= @get('runlength')
+    if idx >= @get('runlength') || !@get('running')
       @set('running', false)
       console.log('Experiment completed')
       return
+    console.log('tick, running = ', @get('running'))
+    @playNextTone()
+#    @makeTone()
+    setTimeout(@tock, @get('timeout') * 0.75 )
 
-  tock: ->
+
+  tock: =>
     idx = @get('idx')
+    idx += 1
+    @set('idx', idx)
+    console.log('tock')
+    setTimeout(@tick, @get('timeout') * 0.25 )
+
+
 
   addAnswer: (answer) ->
 
@@ -118,13 +133,19 @@ class TestModel extends Backbone.Model
 
     return downloadString
 
+  playNextTone: ->
+    idx = @get('idx')
+    tones = @get('trialTones')
+    tone = tones[idx]
+    @playToneRecord(tone)
+
   playTone: (tone) ->
     @synth.triggerAttackRelease(tone, "8n")
 
   playToneRecord: (tone) ->
     @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: null })
     @playTone(tone)
-    console.log("playToneRecord")
+    console.log("playToneRecord", tone)
 
   makeTone: (tone, time) ->
     setTimeout( =>

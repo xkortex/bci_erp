@@ -179,7 +179,7 @@ class TestLayoutView extends Mn.LayoutView
   onDownload: (raw_txt) ->
 
     donwloadOptions =
-      filename: @model.get('filename') 
+      filename: @model.get('filename')
       type:     'text/plain'
       content:  raw_txt
 
