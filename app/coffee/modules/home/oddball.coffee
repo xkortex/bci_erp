@@ -1,6 +1,8 @@
 ## Programmatically generate the file testparams.coffee
 
-
+# Extending the built-in object, because YOLO
+Array::sum = (fn = (x) -> x) ->
+  @reduce ((a, b) -> a + fn b), 0
 
 class OddballTrial extends Backbone.Model
   #  constructor: (@dummy)  ->
@@ -17,7 +19,7 @@ class OddballTrial extends Backbone.Model
   setup: () ->
     console.log("Oddball setup() called")
     # Feels super janky but idk how to do it better
-    @num_trials = 4 # Number of trials to run
+    @num_trials = 8 # Number of trials to run
     @num_pad = 2 # ensure at least num_pad low tones occur first
     @time_ms = 400 # Time in ms for each trial
     @oddball_rate = 0.25 # This is the rate at which the oddball occurs
@@ -27,14 +29,54 @@ class OddballTrial extends Backbone.Model
     @toneHigh = @availableTones[1]
     @toneEnd = @availableTones[2]
 
+  conveyor: (ary) ->
+    # First element goes to end of list. Creates a new object
+    ary2 = (ary[n] for n in [1...ary.length])
+    console.log("conveyor", ary2)
+    ary2.push(ary[0])
+    console.log("conveyor", ary2)
+
+    return ary2
+
+
+  max: (ary) ->
+    return ary.reduce (t, s) -> Math.max(t, s)
+
   sum: (ary) ->
-#    console.log(ary)
-    accu = 0 # jesus christ why do I have to do this?
-    console.log("Summing: #{ary} length: #{ary.length}")
-    for i in [0...ary.length] # this is safe and i know it works
-      console.log(Number(ary[i]))
-      accu = accu + Number(ary[i]) # ffs why do I have to hand-hold this language every step of the way?
+    console.log("sum(array)", ary)
+
+    accu = ary.reduce (t, s)->t + s
+    console.log("accu", accu)
     return accu
+
+    #    console.log(ary)
+    #    accu = 0 # jesus christ why do I have to do this?
+    #    console.log("Summing: #{ary} length: #{ary.length}")
+    #    for i in [0...ary.length] # this is safe and i know it works
+    #      console.log(Number(ary[i]))
+    #      accu = accu + Number(ary[i]) # ffs why do I have to hand-hold this language every step of the way?
+
+  check_for_adjacent: (bitlist) ->
+    # Now we need to check to see if we have any adjacent ones
+    bitlist2 = @conveyor(bitlist)
+#    bitlist2.push(bitlist2.shift()) # move first to end
+    console.log("check_for_adjacent: |#{bitlist}|#{bitlist2}|")
+    console.log(typeof bitlist, typeof bitlist2, typeof bitlist[0], typeof bitlist2[0])
+    console.log(bitlist2[0])
+#    ziplist = _.zip(bitlist, bitlist2)
+#    console.log("check_for_adjacent (ziplist): |#{ziplist}|")
+    sumlist = []
+    sumlist.push(bitlist[i]+ bitlist2[i]) for i in [0...bitlist.length]
+    console.log("Summing: ", bitlist[i], bitlist2[i]) for i in [0...bitlist.length]
+
+    console.log("check_for_adjacent (sumlist): |#{sumlist}|")
+
+    valmax = @max(sumlist)
+    console.log("check_for_adjacent (valmax): |#{valmax}|")
+
+    if 1 == valmax
+      return true
+    return false
 
 
   get_weighted_bits: (p) ->
@@ -46,8 +88,10 @@ class OddballTrial extends Backbone.Model
 
   get_weighted_bitlist: (n, p) ->
     bitlist = []
-    for i in [0...n]
-      bitlist.push(@get_weighted_bits(p))
+
+    bitlist.push(@get_weighted_bits(p)) for i in [0...n]
+#    bitlist = [@get_weighted_bits(p) for i in n]
+#    console.log("get_weighted_bitlist: |#{bitlist}|")
     return bitlist
 
   get_asserted_list: (n, p) ->
@@ -68,8 +112,7 @@ class OddballTrial extends Backbone.Model
       console.log(typeof bitlist[0])
       bitsum = @sum(bitlist)
       console.log("get_asserted_list Bitsum: |#{bitsum}|")
-      if bitsum == k
-        return bitlist
+      return bitlist if bitsum == k
       iters += 1
 
     throw "(Internal Error) Excessive loop occured in OddballTrial.get_asserted_list"
@@ -97,14 +140,10 @@ class OddballTrial extends Backbone.Model
     while iters < 100
       bitlist = []
       for i in [0...k]
-        bitlist += @get_asserted_list(E, p)
+        bitlist = bitlist.concat(@get_asserted_list(E, p))
       # Now we need to check to see if we have any adjacent ones
-      bitlist2 = [n for n in bitlist]
-      bitlist2.push(bitlist2.shift()) # move first to end
-      sumlist = []
-      for i in [0...bitlist.length]
-        sumlist.push(bitlist[i] + bitlist2[i])
-      if 1 == Math.max(sumlist)
+
+      if @check_for_adjacent(bitlist)
         return bitlist
       iters += 1
     throw "(Internal Error) Excessive loop occured in OddballTrial.get_asserted_epoch_list"

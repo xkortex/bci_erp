@@ -9,7 +9,8 @@ class HomeRoute extends require '../../base/route'
 
   fetch: ->
     experiment = new OddballTrial(42)
-#    experiment.generate_default_trial()
+    trialTones = experiment.generate_default_trial()
+    console.log("HomeRoute->fetch: trialTones", experiment.trialTones, trialTones)
     @model = new TestModel(TestParams) # why is this so convoluted?
 
   render: ->
