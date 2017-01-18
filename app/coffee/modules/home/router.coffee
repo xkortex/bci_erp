@@ -1,4 +1,5 @@
-HomeRoute = require './home/route'
+HomeRoute   = require './home/route'
+UploadRoute = require './upload/route'
 
 # # # # #
 
@@ -6,10 +7,14 @@ HomeRoute = require './home/route'
 class HomeRouter extends require '../base/router'
 
   routes:
-    '(/)':  'home'
+    '(/)':        'home'
+    'upload(/)':  'upload'
 
   home: ->
     new HomeRoute({ container: @container })
+
+  upload: ->
+    new UploadRoute({ container: @container })
 
 # # # # #
 
