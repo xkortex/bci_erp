@@ -12,6 +12,9 @@ class TestModel extends Backbone.Model
     answers:  []
     toneTimes: []
     running: false
+    filename: 'unnamed.txt'
+    idx: 0
+    runlength: 10
 
   initialize: (options={}) ->
     @synth = new Tone.Synth(
@@ -27,13 +30,22 @@ class TestModel extends Backbone.Model
     ).toMaster()
 
   setup_experiment: ->
+    # Reset the experiment
     oddball = @get('oddball')
     console.log("Firing experiment generator (default tones)", oddball.trialTones)
-    oddball.generate_trial(16, .25)
+#    oddball.generate_trial(200, .1)
+    oddball.generate_default_trial()
 
     console.log("New Tones", oddball.trialTones)
+    @set('filename', 'oddball_run_' + moment().format('YYYY-MM-DD_HH-MM-SS')) # 2017-01-18_15-04-20-oddball.txt
     @set('trialTones', oddball.trialTones)
+    @set('runlength', oddball.trialTones.length)
+    @set('idx', 0)
     console.log("Bound new experiment to model")
+
+  halt: ->
+    @set('running', false)
+    console.log("Manually halted")
 
   start: ->
     @set('running', true)
@@ -47,10 +59,15 @@ class TestModel extends Backbone.Model
       console.log("start, trialTones", tone)
       @makeTone(tone, index * @get('timeout'))
 
-  halt: ->
-    @set('running', false)
-    console.log("Manually halted")
+  tick: ->
+    idx = @get('idx')
+    if idx >= @get('runlength')
+      @set('running', false)
+      console.log('Experiment completed')
+      return
 
+  tock: ->
+    idx = @get('idx')
 
   addAnswer: (answer) ->
 

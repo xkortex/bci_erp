@@ -123,10 +123,10 @@ class ControlsView extends Mn.LayoutView
   keyAction: (e) =>
     console.log(e.keyCode)
     # 37 = left, 39 = right
-    e.preventDefault() if e.keyCode in [K_LEFT, K_RIGHT] #== 37 || e.keyCode == 39
+    e.preventDefault() if e.keyCode in [K_LEFT, K_RIGHT, K_ESC] #== 37 || e.keyCode == 39
     return @model.addAnswer('1')  if e.keyCode == K_LEFT
     return @model.addAnswer('2') if e.keyCode == K_RIGHT
-    return @model.halt() if e.keyCode == K_ESC || K_ENTER
+    return @model.halt() if e.keyCode == K_ESC #|| K_ENTER
 
   submitAnswer: (e) ->
     answer = $(e.currentTarget).data('submit')
@@ -179,7 +179,7 @@ class TestLayoutView extends Mn.LayoutView
   onDownload: (raw_txt) ->
 
     donwloadOptions =
-      filename: moment().format('x')#'download.csv' # todo: dynamically name this
+      filename: @model.get('filename') 
       type:     'text/plain'
       content:  raw_txt
 
