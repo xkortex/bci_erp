@@ -36,6 +36,7 @@ class TestModel extends Backbone.Model
 #    oddball.generate_trial(200, .1)
     oddball.generate_default_trial()
 
+
     console.log("New Tones", oddball.trialTones)
     @set('filename', 'oddball_run_' + moment().format('YYYY-MM-DD_HH-MM-SS')) # 2017-01-18_15-04-20-oddball.txt
     @set('trialTones', oddball.trialTones)

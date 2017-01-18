@@ -1,8 +1,6 @@
 ## Programmatically generate the file testparams.coffee
 
-# Extending the built-in object, because YOLO
-Array::sum = (fn = (x) -> x) ->
-  @reduce ((a, b) -> a + fn b), 0
+fs = require "fs"
 
 class OddballTrial
   #  constructor: (@dummy)  ->
@@ -23,6 +21,12 @@ class OddballTrial
     @toneEnd = @availableTones[2]
     @trialTones = ['A5', 'B5', 'C5']
 
+  dump: ->
+    saved_params = {'timeout':@timeout, 'availableTones': @availableTones}
+    localStorage.oddball_params = JSON.stringify(saved_params)
+    console.log("dumping to oddball_params.json", saved_params)
+#    fs.writeFile "saved_params.json", JSON.stringify(saved_params), (error) ->
+#      console.error("Error writing file", error) if error
 
 
   conveyor: (ary) ->
@@ -126,6 +130,7 @@ class OddballTrial
 #    console.log("generate_trial: tones_list", tones_list)
     @trialTones = tones_list
     console.log("Completed generate_trial")
+    @dump()
 
     return tones_list
 
