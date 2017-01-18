@@ -59,6 +59,7 @@ paths =
       nodeModules + 'hammerjs/hammer.js'
       nodeModules + 'tone/build/Tone.js'
       nodeModules + 'moment/moment.js'
+      nodeModules + 'filer.js/dist/filer.min.js'
 
     ]
 
