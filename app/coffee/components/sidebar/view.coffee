@@ -15,6 +15,7 @@ class SidebarView extends Marionette.LayoutView
 
   modules: [
     { title:  'Home', icon: 'fa-home', href: '#', divider: true }
+    { title:  'Upload', icon: 'fa-upload', href: '#upload', divider: true }
   ]
 
   serializeData: ->
