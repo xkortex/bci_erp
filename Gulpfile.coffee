@@ -14,6 +14,10 @@ paths =
     src: 'coffee/app.coffee'
     dest: 'app.js'
 
+  server_bundle:
+    src: 'coffee/server.coffee'
+    dest: 'server.js'
+
   nwk_package:
     src:  './app/nwk_package.coffee'
     dest: './build/package.json'
@@ -21,6 +25,7 @@ paths =
   nwk_release:
     src:        './build/**/**'
     version:    '0.14.6'
+    # platforms: ['osx64', 'linux64']
     platforms: ['osx64']
 
   sass:
@@ -35,6 +40,10 @@ paths =
     img:
       src:  './app/img/*'
       dest: './build/img'
+
+    python:
+      src:  './app/python/*'
+      dest: './build/python'
 
   concat:
     dest: 'vendor.js'
@@ -116,16 +125,29 @@ gulp.task 'nodewebkit_release', ->
     console.error error
     return
 
+# Bundle server task
+gulp.task 'server_bundle', ->
+  gulp.src(paths.src + paths.server_bundle.src)
+    .pipe plugins.plumber()
+    .pipe plugins.coffee({bare: true})
+    .pipe gulp.dest paths.dest + 'js/'
+
+# Copy Python files
+gulp.task 'copy_python', ->
+  gulp.src paths.copy.python.src
+    .pipe plugins.plumber()
+    .pipe gulp.dest paths.copy.python.dest
+
 # # # # #
 
 # Build tasks
 gulp.task 'default', ['dev']
 
 gulp.task 'dev', =>
-  plugins.runSequence.use(gulp)('env_dev', 'copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'watch', 'webserver')
+  plugins.runSequence.use(gulp)('env_dev', 'copy_fontawesome', 'copy_python', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'server_bundle', 'watch', 'webserver')
 
 gulp.task 'release', =>
-  plugins.runSequence.use(gulp)('env_prod', 'copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle', => console.log 'Release completed.' )
+  plugins.runSequence.use(gulp)('env_prod', 'copy_fontawesome', 'copy_python', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'server_bundle', => console.log 'Release completed.' )
 
 gulp.task 'nwk_release', =>
-  plugins.runSequence.use(gulp)('env_dev', 'copy_fontawesome', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'nodewebkit_package', 'nodewebkit_release', => console.log 'NWK Release completed.' )
+  plugins.runSequence.use(gulp)('env_dev', 'copy_fontawesome', 'copy_python', 'copy_images', 'sass', 'jade', 'concat', 'bundle', 'server_bundle', 'nodewebkit_package', 'nodewebkit_release', => console.log 'NWK Release completed.' )
