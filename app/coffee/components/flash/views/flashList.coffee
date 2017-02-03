@@ -20,8 +20,9 @@ class FlashChild extends Marionette.LayoutView
     @$el.fadeIn()
 
   remove: ->
-    @$el.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', => Marionette.LayoutView.prototype.remove.call(@) )
-    @$el.slideToggle().addClass('animated fadeOutRight')
+    @$el.slideToggle( =>
+      Marionette.LayoutView.prototype.remove.call(@)
+    )
 
   dismiss: =>
     @model.collection?.remove( @model ) # QUESTION - is this memory safe?

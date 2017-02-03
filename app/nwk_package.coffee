@@ -1,10 +1,11 @@
 # NodeWebKit package.json
 config =
-  name:     'NodeWebKit Boilerplate'
-  version:  '0.0.1'
-  main:     'index.html'
+  name:       'OpenBCI_App'
+  version:    '0.0.1'
+  main:       'index.html'
+  'node-main':  './js/server.js'
   window:
-    title:      'NodeWebKit Demo'
+    title:      'OpenBCI App'
     icon:       './img/icon.png'
     toolbar:    true
     frame:      true
