@@ -27,11 +27,14 @@ class UploadView extends Marionette.LayoutView
     target = e.target
     fr = new FileReader()
     fr.onload = => @onUpload(fr.result)
-    fr.readAsDataURL(target.files[0])
+#    fr.readAsDataURL(target.files[0]) # encoded data
+    fr.readAsText(target.files[0]) # do this if you wanna grab the whole dataframe
+
 
   onUpload: (fileData) ->
     console.log 'UPLOADED FILE'
-    console.log fileData
+#    console.log fileData
+    console.log fileData.length
 
 # # # # #
 

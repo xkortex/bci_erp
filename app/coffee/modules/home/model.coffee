@@ -6,15 +6,22 @@ class TestModel extends Backbone.Model
     # these will be overridden by testparams.json. Just a prototype to show the format
     oddball: {}
     timeout:  1000
+    meanTimeout: 1000
     trialTones:    ['A4','C4','A4','C4','C4','C4','A4']
-    toneLow:  'C4'
-    toneHigh: 'B4'
+    toneLow:  'F4'
+    toneHigh: 'G5'
     answers:  []
     toneTimes: []
     running: false
     filename: 'unnamed.txt'
     idx: 0
     runlength: 10
+    progbarVisible: false # actual erp wants minimal distraction - probably closed-eyed
+    playEndTones: true
+
+    # bring BOSE noise cancelling - actually nvm speakers
+    # P3 Pz P4 or FC F3 F4 central vs peripheral, frontal vs parietal
+    # students are not entirely the most advanced of the neuroscience students (in terms of prereq)
 
   initialize: (options={}) ->
     @synth = new Tone.Synth(
@@ -35,8 +42,6 @@ class TestModel extends Backbone.Model
     console.log("Firing experiment generator (default tones)", oddball.trialTones)
 #    oddball.generate_trial(200, .1)
     oddball.generate_default_trial()
-
-
     console.log("New Tones", oddball.trialTones)
     @set('filename', 'oddball_run_' + moment().format('YYYY-MM-DD_HH-MM-SS')) # 2017-01-18_15-04-20-oddball.txt
     @set('trialTones', oddball.trialTones)
@@ -69,10 +74,15 @@ class TestModel extends Backbone.Model
     if idx >= @get('runlength') || !@get('running')
       @set('running', false)
       console.log('Experiment completed')
+      @zelda()
+      @end()
       return
     console.log('tick, running = ', @get('running'))
     @playNextTone()
 #    @makeTone()
+    # Update the internal timeout based on a random (normal) variable
+    oddball = @get('oddball')
+    @set('timeout', oddball.get_random_timeout());
     setTimeout(@tock, @get('timeout') * 0.75 )
 
 
@@ -95,11 +105,12 @@ class TestModel extends Backbone.Model
     answers.push(data)
     @trigger('answer')
 
-    # Ends if all tones have been answered
-    @end() if answers.length == @get('trialTones').length
+    # Ends if all tones have been answered - disabled because we want all tones to play
+#    @end() if answers.length == @get('trialTones').length
 
   end: ->
     @trigger('end')
+    @zelda() if @get('playEndTones')
     @download()
 
   restart: ->
@@ -147,12 +158,38 @@ class TestModel extends Backbone.Model
     @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: null })
     @playTone(tone)
     console.log("playToneRecord", tone)
+    @trigger('tonePlayed')
 
   makeTone: (tone, time) ->
     setTimeout( =>
       return if !@get('running')
       @playToneRecord(tone)
     , time)
+
+  zelda: ->
+    # arpeggio: F A B C#  F# A# C D  A B C# D#  A# C D E  B C# D# F#?
+    # chords: C/A chromatic rising
+    synth = new Tone.PolySynth(6, Tone.Synth).toMaster();
+    #set the attributes using the set interface
+    synth.set("detune", -0);
+    cadence = 160
+#    seq = [["C5", "A5"], ["C#5", "A#5"], ["D5", "B5"], ["D#5", "C6"]]
+    seq = [["C5"], ["C#5"], ["D5"], ["D#5"]]
+    #play a chord
+    setTimeout( =>
+      synth.triggerAttackRelease(seq[0], "8n")
+    , cadence *0)
+    setTimeout( =>
+      synth.triggerAttackRelease(seq[1], "8n")
+    , cadence *1)
+    setTimeout( =>
+      synth.triggerAttackRelease(seq[2], "8n")
+    , cadence *2)
+    setTimeout( =>
+      synth.triggerAttackRelease(seq[3], "4n")
+    , cadence *3)
+
+
 
 # # # # # #
 

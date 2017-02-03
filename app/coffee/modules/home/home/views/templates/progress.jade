@@ -1,11 +1,12 @@
-
+// Controls for the progress bar in the test screen. Somehow linked with model, not sure how exactly
 .progress-wrapper.col-xs-12.col-sm-6.col-sm-push-3.text-center
   ul.progress-list
     each tone, index in trialTones
       li
-        if index < answers.length
+        //if index < answers.length
+        if index < toneTimes.length && progbarVisible
           i.fa.fa-fw.fa-2x.fa-circle
 
-        else
+        else if progbarVisible
           i.fa.fa-fw.fa-2x.fa-circle-o
 

@@ -14,10 +14,12 @@ class ProgressView extends Mn.LayoutView
 
   modelEvents:
     'answer': 'render'
+    'tonePlayed': 'render'
 
 # # # # #
 
 class StartView extends Mn.LayoutView
+  # This is the initial screen for staging before the ERP experiment begins
   template: require './templates/start'
   className: 'row'
 
@@ -50,6 +52,7 @@ class StartView extends Mn.LayoutView
     e.preventDefault() if e.keyCode in [K_LEFT, K_RIGHT, K_SPACE] #== 37 || e.keyCode == 39 || 32
     return @model.playTone(@model.get('toneHigh'))  if e.keyCode == K_RIGHT # right arrow
     return @model.playTone(@model.get('toneLow')) if e.keyCode == K_LEFT # left arrow
+    return @model.zelda() if e.keyCode == K_A # left arrow
     return @start() if e.keyCode == K_SPACE # Start
 
 # # # # #
@@ -57,8 +60,8 @@ class StartView extends Mn.LayoutView
 class CountdownView extends Mn.LayoutView
   template: require './templates/countdown'
   className: 'row'
-#  countdownCount = 3
-  countdownCount = 1 # speed up for testing
+  countdownCount = 3
+#  countdownCount = 1 # speed up for testing
 
   ui:
     counter: '[data-display=count]'
@@ -68,13 +71,13 @@ class CountdownView extends Mn.LayoutView
 
   onRender: ->
     @setCount(3, 0)
-#    @setCount(2, 1000)
-#    @setCount(1, 2000)
+    @setCount(2, 1000)
+    @setCount(1, 2000)
 
     setTimeout( =>
       @model.start()
-#    , 3000)
-    , 1000)
+    , 3000)
+#    , 1000)
 
 
   setCount: (count, timeout) ->
@@ -105,6 +108,7 @@ class EndView extends Mn.LayoutView
 # # # # #
 
 class ControlsView extends Mn.LayoutView
+  # This is the experimental test section
   template: require './templates/controls'
   className: 'row'
 

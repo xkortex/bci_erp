@@ -21,7 +21,7 @@ paths =
   nwk_release:
     src:        './build/**/**'
     version:    '0.14.6'
-    platforms: ['osx64']
+    platforms: ['osx64', 'linux64']
 
   sass:
     src:  './app/sass/app.sass'

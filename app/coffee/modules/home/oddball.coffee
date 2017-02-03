@@ -10,16 +10,28 @@ class OddballTrial
 
   constructor: (options = {}) ->
     console.log("Constructor called on OddballTrial")
-    @num_trials = 12 # Number of trials to run
-    @num_pad = 2 # ensure at least num_pad low tones occur first
+    @num_trials = 4 # Number of trials to run
+    @num_pad = 0 # ensure at least num_pad low tones occur first
     @timeout = 1000 # Time in ms for each trial
+    @timeout_mean = 2000 # ms
+    @timeout_sigma = 333 # 95% interval = (mean) ms +/- 3*(sigma) ms
     @oddball_rate = 0.25 # This is the rate at which the oddball occurs
-    @availableTones = ['F4', 'C5', 'F4'] # [lo, hi, end]
+    @availableTones = ['F4', 'G5', 'F4'] # [lo, hi, end]
     # Only first two will be used for the random trials
     @toneLow = @availableTones[0]
     @toneHigh = @availableTones[1]
     @toneEnd = @availableTones[2]
     @trialTones = ['A5', 'B5', 'C5']
+    # actual experiment will be about 6 minutes. 20 oddballs @ 10% rate and 1.5-2 s
+    # todo: stochastic time interval 95% = +/- 500 ms
+    # Numeric code uses bitmasks, because why not? May need to multiplex these, and ERPLAB seems not to care about
+    # the actual numerical value
+    @numcodes =
+      frequentStim: 0x2
+      infrequentStim: 0x4
+      responseFreq: 0x12
+      responseInfreq: 0x14
+
 
   dump: ->
     saved_params = {'timeout':@timeout, 'availableTones': @availableTones}
@@ -49,6 +61,16 @@ class OddballTrial
     #    for i in [0...ary.length] # this is safe and i know it works
     #      console.log(Number(ary[i]))
     #      accu = accu + Number(ary[i]) # ffs why do I have to hand-hold this language every step of the way?
+
+  # Standard Normal variate using Box-Muller transform.
+  randn_bm: (mean, sigma) ->
+    u = 1 - Math.random(); # Subtraction to flip [0, 1) to (0, 1].
+    v = 1 - Math.random();
+    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) * sigma + mean
+
+  get_random_timeout: () ->
+    return @randn_bm(@timeout_mean, @timeout_sigma)
+
 
   check_for_adjacent: (bitlist) ->
     # Now we need to check to see if we have any adjacent ones
