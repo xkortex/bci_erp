@@ -27,10 +27,11 @@ class OddballTrial
     # Numeric code uses bitmasks, because why not? May need to multiplex these, and ERPLAB seems not to care about
     # the actual numerical value
     @numcodes =
-      frequentStim: 0x2
-      infrequentStim: 0x4
-      responseFreq: 0x12
-      responseInfreq: 0x14
+      error1: 0x1
+      stimulus_freq: 0x2
+      stimulus_infreq: 0x4
+      response_freq: 0x20
+      response_infreq: 0x40
 
 
   dump: ->

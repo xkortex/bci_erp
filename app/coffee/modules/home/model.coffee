@@ -10,8 +10,8 @@ class TestModel extends Backbone.Model
     trialTones:    ['A4','C4','A4','C4','C4','C4','A4']
     toneLow:  'F4'
     toneHigh: 'G5'
-    answers:  []
-    toneTimes: []
+    answer_events:  []
+    tone_events: []
     running: false
     filename: 'unnamed.txt'
     idx: 0
@@ -64,7 +64,7 @@ class TestModel extends Backbone.Model
     trialTones = @get('trialTones')
     i = 0
 
-    @tick()
+    @tick() # fire off the pattern sequence
 #    for tone, index in @get('trialTones')
 #      console.log("start, trialTones", tone)
 #      @makeTone(tone, index * @get('timeout'))
@@ -74,7 +74,6 @@ class TestModel extends Backbone.Model
     if idx >= @get('runlength') || !@get('running')
       @set('running', false)
       console.log('Experiment completed')
-      @zelda()
       @end()
       return
     console.log('tick, running = ', @get('running'))
@@ -96,17 +95,23 @@ class TestModel extends Backbone.Model
 
 
   addAnswer: (answer) ->
-
+    oddball = @get('oddball')
+    eventname = 'response_freq' if answer == '1'
+    eventname = 'response_infreq' if answer == '2'
+    eventcode = oddball.numcodes[eventname]
+    console.log('Eventcode', eventcode)
     data =
+      tone:       null
       resp:       answer
       timestamp:  moment().format('x'),
+      eventcode:  eventcode
+      labelname:  eventname
 
-    answers = @get('answers')
-    answers.push(data)
+    @get('answer_events').push(data)
     @trigger('answer')
 
     # Ends if all tones have been answered - disabled because we want all tones to play
-#    @end() if answers.length == @get('trialTones').length
+#    @end() if answer_events.length == @get('trialTones').length
 
   end: ->
     @trigger('end')
@@ -114,8 +119,8 @@ class TestModel extends Backbone.Model
     @download()
 
   restart: ->
-    @set('answers', [])
-    @set('toneTimes',[])
+    @set('answer_events', [])
+    @set('tone_events',[])
     @trigger('restart')
 
   # Formats download string & triggers view to download file
@@ -131,15 +136,17 @@ class TestModel extends Backbone.Model
       row.push obj.timestamp
       row.push obj.resp || 0
       row.push obj.tone || 0
+      row.push obj.eventcode || 0
+      row.push obj.labelname || 0
       return row.join(',')
 
     # Assembles CSV results
-    for each in @get('toneTimes')
+    for each in @get('tone_events')
       downloadString += makeRow(each)
       downloadString += "\n"
 
     # Assembles CSV results
-    for each in @get('answers')
+    for each in @get('answer_events')
       downloadString += makeRow(each)
       downloadString += "\n"
 
@@ -155,7 +162,21 @@ class TestModel extends Backbone.Model
     @synth.triggerAttackRelease(tone, "8n")
 
   playToneRecord: (tone) ->
-    @get('toneTimes').push({tone: tone, timestamp: moment().format('x'), resp: null })
+    oddball = @get('oddball')
+    # todo: refact this to use enums or something, also merge with the answer event. DRY.
+    eventname = 'stimulus_freq' if tone == oddball.toneLow
+    eventname = 'stimulus_infreq' if tone == oddball.toneHigh
+    eventname ||= 'error1'
+    eventcode = oddball.numcodes[eventname]
+    console.log('Eventcode playToneRecord', eventcode)
+    data =
+      tone: tone
+      resp: null
+      timestamp: moment().format('x')
+      eventcode:  eventcode
+      labelname:  eventname
+
+    @get('tone_events').push(data)
     @playTone(tone)
     console.log("playToneRecord", tone)
     @trigger('tonePlayed')
@@ -173,17 +194,18 @@ class TestModel extends Backbone.Model
     #set the attributes using the set interface
     synth.set("detune", -0);
     cadence = 160
-#    seq = [["C5", "A5"], ["C#5", "A#5"], ["D5", "B5"], ["D#5", "C6"]]
-    seq = [["C5"], ["C#5"], ["D5"], ["D#5"]]
+    seq = [["C5", "A5"], ["C#5", "A#5"], ["D5", "B5"], ["D#5", "C6"]]
+#    seq = [["C5"], ["C#5"], ["D5"], ["D#5"]]
+    t1 = .15
     #play a chord
     setTimeout( =>
-      synth.triggerAttackRelease(seq[0], "8n")
+      synth.triggerAttackRelease(seq[0], t1)
     , cadence *0)
     setTimeout( =>
-      synth.triggerAttackRelease(seq[1], "8n")
+      synth.triggerAttackRelease(seq[1], t1)
     , cadence *1)
     setTimeout( =>
-      synth.triggerAttackRelease(seq[2], "8n")
+      synth.triggerAttackRelease(seq[2], t1)
     , cadence *2)
     setTimeout( =>
       synth.triggerAttackRelease(seq[3], "4n")
