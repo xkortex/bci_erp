@@ -12,10 +12,13 @@ class OddballTrial
     console.log("Constructor called on OddballTrial")
     @num_trials = 4 # Number of trials to run
     @num_pad = 0 # ensure at least num_pad low tones occur first
+    @num_pad_end = 1 # final pad out
     @timeout = 1000 # Time in ms for each trial
     @timeout_mean = 2000 # ms
     @timeout_sigma = 333 # 95% interval = (mean) ms +/- 3*(sigma) ms
     @oddball_rate = 0.25 # This is the rate at which the oddball occurs
+    # todo: options to change the experiment for harmonic interval, melodic interval, chords vs pair vs mono, etc
+    # so many possibilities!!
     @availableTones = ['F4', 'G5', 'F4'] # [lo, hi, end]
     # Only first two will be used for the random trials
     @toneLow = @availableTones[0]
@@ -26,12 +29,17 @@ class OddballTrial
     # todo: stochastic time interval 95% = +/- 500 ms
     # Numeric code uses bitmasks, because why not? May need to multiplex these, and ERPLAB seems not to care about
     # the actual numerical value
+    f_infreq = 0b0010 # freq(0) or infreq(1)
+    f_stim = 0b0100
+    f_resp = 0b1000
     @numcodes =
       error1: 0x1
-      stimulus_freq: 0x2
-      stimulus_infreq: 0x4
-      response_freq: 0x20
-      response_infreq: 0x40
+      stimulus_freq: f_stim
+      stimulus_infreq: f_stim | f_infreq
+      response_freq: f_resp
+      response_infreq: f_resp | f_infreq
+      start_exp: 0b11111110
+      stop_exp:  0b11111111
 
 
   dump: ->
@@ -148,7 +156,8 @@ class OddballTrial
     tones_list = (@availableTones[0] for dummy in [0...@num_pad])
     bit_list =  (0 for dummy in [0...@num_pad])
     bit_list = bit_list.concat(@get_asserted_epoch_list(num_trials, oddball_rate))
-    bit_list = bit_list.concat([2])
+    bit_list = bit_list.concat(0 for dummy in [0...@num_pad_end])
+    bit_list = bit_list.concat([2]) # end tone
     tones_list = (@availableTones[bit] for bit in bit_list) # Sequence complete tone
 #    console.log("generate_trial: tones_list", tones_list)
     @trialTones = tones_list

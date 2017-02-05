@@ -12,6 +12,7 @@ class TestModel extends Backbone.Model
     toneHigh: 'G5'
     answer_events:  []
     tone_events: []
+    events: []
     running: false
     filename: 'unnamed.txt'
     idx: 0
@@ -43,7 +44,9 @@ class TestModel extends Backbone.Model
 #    oddball.generate_trial(200, .1)
     oddball.generate_default_trial()
     console.log("New Tones", oddball.trialTones)
-    @set('filename', 'oddball_run_' + moment().format('YYYY-MM-DD_HH-MM-SS')) # 2017-01-18_15-04-20-oddball.txt
+    filename = 'oddball_run_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.csv'
+    console.log('Output filename: ' + filename)
+    @set('filename',  filename)  # 2017-01-18_15-04-20-oddball.txt
     @set('trialTones', oddball.trialTones)
     @set('runlength', oddball.trialTones.length)
     @set('timeout', oddball.timeout)
@@ -51,6 +54,16 @@ class TestModel extends Backbone.Model
     #todo: just put this all in the object and call into it
     @set('idx', 0)
     console.log("Bound new experiment to model")
+    data =
+      tone:       null
+      resp:       null
+      timestamp:  @default_timestamp()
+      unixtime:  moment().format('x')
+      eventcode:  oddball.numcodes['start_exp']
+      labelname:  'start experiment'
+    @get('events').push(data) # keep track of event types separately from master log, for event triggers and such
+    console.log(data)
+
 
   halt: ->
     @set('running', false)
@@ -58,16 +71,21 @@ class TestModel extends Backbone.Model
 
   start: ->
     @set('running', true)
-    @trigger('start')
     console.log("Starting")
+
 
     trialTones = @get('trialTones')
     i = 0
-
-    @tick() # fire off the pattern sequence
+    setTimeout(@initiate_experiment(), 1000)
 #    for tone, index in @get('trialTones')
 #      console.log("start, trialTones", tone)
 #      @makeTone(tone, index * @get('timeout'))
+
+  initiate_experiment: =>
+    console.log('Initiate')
+    @trigger('start')
+
+    @tick() # fire off the pattern sequence
 
   tick: =>
     idx = @get('idx')
@@ -89,24 +107,28 @@ class TestModel extends Backbone.Model
     idx = @get('idx')
     idx += 1
     @set('idx', idx)
-    console.log('tock')
+#    console.log('tock')
     setTimeout(@tick, @get('timeout') * 0.25 )
 
-
+  default_timestamp: ->
+    return moment().format()
 
   addAnswer: (answer) ->
     oddball = @get('oddball')
     eventname = 'response_freq' if answer == '1'
     eventname = 'response_infreq' if answer == '2'
     eventcode = oddball.numcodes[eventname]
-    console.log('Eventcode', eventcode)
+#    console.log('Eventcode', eventcode)
     data =
       tone:       null
       resp:       answer
-      timestamp:  moment().format('x'),
+      timestamp:  @default_timestamp()
+      unixtime:  moment().format('x')
       eventcode:  eventcode
       labelname:  eventname
 
+    console.log(data)
+    @get('events').push(data)
     @get('answer_events').push(data)
     @trigger('answer')
 
@@ -115,12 +137,21 @@ class TestModel extends Backbone.Model
 
   end: ->
     @trigger('end')
+    data =
+      tone:       null
+      resp:       null
+      timestamp:  @default_timestamp()
+      unixtime:  moment().format('x')
+      eventcode:  @get('oddball').numcodes['stop_exp']
+      labelname:  'stop experiment'
+    @get('events').push(data)
     @zelda() if @get('playEndTones')
     @download()
 
   restart: ->
     @set('answer_events', [])
     @set('tone_events',[])
+    @set('events', [])
     @trigger('restart')
 
   # Formats download string & triggers view to download file
@@ -134,21 +165,23 @@ class TestModel extends Backbone.Model
     makeRow = (obj) ->
       row = []
       row.push obj.timestamp
+      row.push obj.unixtime
       row.push obj.resp || 0
       row.push obj.tone || 0
       row.push obj.eventcode || 0
       row.push obj.labelname || 0
       return row.join(',')
 
-    # Assembles CSV results
-    for each in @get('tone_events')
-      downloadString += makeRow(each)
-      downloadString += "\n"
+    downloadString += 'timestamp,unixtime,resp,tone,type,label\n'
+
 
     # Assembles CSV results
-    for each in @get('answer_events')
-      downloadString += makeRow(each)
-      downloadString += "\n"
+    for each in @get('events')
+      downloadString += makeRow(each) + "\n"
+
+    # Assembles CSV results
+#    for each in @get('answer_events')
+#      downloadString += makeRow(each) + "\n"
 
     return downloadString
 
@@ -172,13 +205,16 @@ class TestModel extends Backbone.Model
     data =
       tone: tone
       resp: null
-      timestamp: moment().format('x')
+      timestamp: @default_timestamp()
+      unixtime:  moment().format('x')
       eventcode:  eventcode
       labelname:  eventname
 
+    @get('events').push(data)
     @get('tone_events').push(data)
     @playTone(tone)
-    console.log("playToneRecord", tone)
+#    console.log("playToneRecord", tone)
+    console.log(data)
     @trigger('tonePlayed')
 
   makeTone: (tone, time) ->
