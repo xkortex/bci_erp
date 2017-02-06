@@ -10,13 +10,13 @@ class OddballTrial
 
   constructor: (options = {}) ->
     console.log("Constructor called on OddballTrial")
-    @num_trials = 4 # Number of trials to run
-    @num_pad = 0 # ensure at least num_pad low tones occur first
+    @num_trials = 160 # Number of trials to run
+    @num_pad = 1 # ensure at least num_pad low tones occur first
     @num_pad_end = 1 # final pad out
     @timeout = 1000 # Time in ms for each trial
     @timeout_mean = 2000 # ms
     @timeout_sigma = 333 # 95% interval = (mean) ms +/- 3*(sigma) ms
-    @oddball_rate = 0.25 # This is the rate at which the oddball occurs
+    @oddball_rate = 0.1 # This is the rate at which the oddball occurs
     # todo: options to change the experiment for harmonic interval, melodic interval, chords vs pair vs mono, etc
     # so many possibilities!!
     @availableTones = ['F4', 'G5', 'F4'] # [lo, hi, end]

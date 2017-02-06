@@ -17,7 +17,7 @@ class TestModel extends Backbone.Model
     filename: 'unnamed.txt'
     idx: 0
     runlength: 10
-    progbarVisible: false # actual erp wants minimal distraction - probably closed-eyed
+    progbarVisible: true # actual erp wants minimal distraction - probably closed-eyed
     playEndTones: true
 
     # bring BOSE noise cancelling - actually nvm speakers
@@ -54,13 +54,15 @@ class TestModel extends Backbone.Model
     #todo: just put this all in the object and call into it
     @set('idx', 0)
     console.log("Bound new experiment to model")
-    data =
-      tone:       null
-      resp:       null
-      timestamp:  @default_timestamp()
-      unixtime:  moment().format('x')
-      eventcode:  oddball.numcodes['start_exp']
-      labelname:  'start experiment'
+#    data =
+#      tone:       null
+#      resp:       null
+#      timestamp:  @default_timestamp()
+#      unixtime:  moment().format('x')
+#      eventcode:  oddball.numcodes['start_exp']
+#      labelname:  'start experiment'
+    eventcode = @get('oddball').numcodes['start_exp']
+    data = @packDataObj(null, null, eventcode, 'start experiment')
     @get('events').push(data) # keep track of event types separately from master log, for event triggers and such
     console.log(data)
 
@@ -111,7 +113,18 @@ class TestModel extends Backbone.Model
     setTimeout(@tick, @get('timeout') * 0.25 )
 
   default_timestamp: ->
-    return moment().format()
+    return moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ') # ISO 8601 with ms
+#    return moment().format()
+
+  packDataObj: (tone, resp, eventcode, eventname) ->
+    data =
+      tone:       tone
+      resp:       resp
+      timestamp:  @default_timestamp()
+      unixtime:  moment().format('x')
+      eventcode:  eventcode
+      labelname:  eventname
+    return data
 
   addAnswer: (answer) ->
     oddball = @get('oddball')
@@ -119,14 +132,7 @@ class TestModel extends Backbone.Model
     eventname = 'response_infreq' if answer == '2'
     eventcode = oddball.numcodes[eventname]
 #    console.log('Eventcode', eventcode)
-    data =
-      tone:       null
-      resp:       answer
-      timestamp:  @default_timestamp()
-      unixtime:  moment().format('x')
-      eventcode:  eventcode
-      labelname:  eventname
-
+    data = @packDataObj(null, answer, eventcode, eventname)
     console.log(data)
     @get('events').push(data)
     @get('answer_events').push(data)
@@ -137,13 +143,16 @@ class TestModel extends Backbone.Model
 
   end: ->
     @trigger('end')
-    data =
-      tone:       null
-      resp:       null
-      timestamp:  @default_timestamp()
-      unixtime:  moment().format('x')
-      eventcode:  @get('oddball').numcodes['stop_exp']
-      labelname:  'stop experiment'
+#    data =
+#      tone:       null
+#      resp:       null
+#      timestamp:  @default_timestamp()
+#      unixtime:  moment().format('x')
+#      eventcode:  @get('oddball').numcodes['stop_exp']
+#      labelname:  'stop experiment'
+    eventcode =  @get('oddball').numcodes['stop_exp']
+    data = @packDataObj(null, null, eventcode, 'stop experiment')
+
     @get('events').push(data)
     @zelda() if @get('playEndTones')
     @download()
@@ -172,7 +181,7 @@ class TestModel extends Backbone.Model
       row.push obj.labelname || 0
       return row.join(',')
 
-    downloadString += 'timestamp,unixtime,resp,tone,type,label\n'
+    downloadString += 'isotime,unixtime,resp,tone,type,label\n'
 
 
     # Assembles CSV results
@@ -202,13 +211,14 @@ class TestModel extends Backbone.Model
     eventname ||= 'error1'
     eventcode = oddball.numcodes[eventname]
     console.log('Eventcode playToneRecord', eventcode)
-    data =
-      tone: tone
-      resp: null
-      timestamp: @default_timestamp()
-      unixtime:  moment().format('x')
-      eventcode:  eventcode
-      labelname:  eventname
+#    data =
+#      tone: tone
+#      resp: null
+#      timestamp: @default_timestamp()
+#      unixtime:  moment().format('x')
+#      eventcode:  eventcode
+#      labelname:  eventname
+    data = @packDataObj(tone, null, eventcode, eventname)
 
     @get('events').push(data)
     @get('tone_events').push(data)
