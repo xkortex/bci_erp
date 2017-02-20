@@ -17,7 +17,7 @@ class TestModel extends Backbone.Model
     filename: 'unnamed.txt'
     idx: 0
     runlength: 10
-    progbarVisible: true # actual erp wants minimal distraction - probably closed-eyed
+    progbarVisible: false # actual erp wants minimal distraction - probably closed-eyed
     playEndTones: true
 
     # bring BOSE noise cancelling - actually nvm speakers

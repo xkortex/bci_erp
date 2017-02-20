@@ -7,7 +7,7 @@ npm-debug.log*
 node_modules
 
 # Builds
-build
+build/*
 
 # Mac
 .DS_Store
@@ -18,4 +18,7 @@ cache
 # IDE stuff
 .idea*
 __pycache__*
+
+# exclude the sample BCI data, can manually add later if needed
+python/sampleData/*
 
